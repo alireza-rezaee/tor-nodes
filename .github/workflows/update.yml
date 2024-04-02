@@ -1,0 +1,49 @@
+name: Sync
+
+on:
+    schedule:
+      - cron: '0 * * * *'
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    name: update data
+    runs-on: ubuntu-latest
+    env:
+        DOTNET_NOLOGO: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0'
+      - name: .Net Restore
+        run: dotnet restore
+      - name: .Net Build
+        run: dotnet build --no-restore
+      - name: .Net Test
+        run: dotnet test -f net8.0 --no-build --no-restore
+      - name: Get data
+        run: dotnet run --project src/TorNodesParser
+      - name: Push data
+        run: |
+          find src/TorNodesParser -name '*-nodes.csv' -exec mv -t . {} +
+          if [ ! -f latest-tor-nodes.csv ] || [ "$(diff latest-tor-nodes.csv tor-nodes.csv)" != "" ]
+          then
+            mv tor-nodes.csv latest-tor-nodes.csv
+            git add latest-tor-nodes.csv
+          fi
+          if [ ! -f latest-tor-exit-nodes.csv ] || [ "$(diff latest-tor-exit-nodes.csv tor-exit-nodes.csv)" != "" ]
+          then
+            mv tor-exit-nodes.csv latest-tor-exit-nodes.csv
+            git add latest-tor-exit-nodes.csv
+          fi
+          if [[ `git status --porcelain | grep nodes.csv` ]]
+          then
+            git config user.name github-actions
+            git config user.email github-actions@github.com
+            git commit -m "update data"
+            git push
+          fi

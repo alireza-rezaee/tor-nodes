@@ -19,7 +19,7 @@ on:
       - '.github/workflows/ci.yml'
 
 jobs:
-  build-package:
+  build:
     name: Build (.Net SDK ${{ matrix.dotnet-version }}, ${{ matrix.operating-system }})
     runs-on: ${{ matrix.operating-system }}
     env:
@@ -36,7 +36,6 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
-          dotnet-quality: 'preview'
       - name: .Net Restore
         run: dotnet restore
       - name: .Net Build
