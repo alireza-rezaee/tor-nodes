@@ -40,7 +40,7 @@ jobs:
             mv tor-exit-nodes.csv latest-tor-exit-nodes.csv
             git add latest-tor-exit-nodes.csv
           fi
-          if [[ `git status --porcelain | grep nodes.csv` ]]
+          if [[ `git diff --cached` ]]
           then
             git config user.name github-actions
             git config user.email github-actions@github.com
