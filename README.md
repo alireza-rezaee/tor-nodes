@@ -10,6 +10,6 @@ Data is retrieved from the Tor's publicly available source. To get the appropria
 
 Provided lists:
 
-* [All Tor Nodes](https://raw.githubusercontent.com/alireza-rezaee/tor-nodes/main/latest.all.csv)
-  * [Guard Tor Nodes](https://raw.githubusercontent.com/alireza-rezaee/tor-nodes/main/latest.guards.csv)
-  * [Exit Tor Nodes](https://raw.githubusercontent.com/alireza-rezaee/tor-nodes/main/latest.exits.csv)
+* [All Tor nodes](https://raw.githubusercontent.com/alireza-rezaee/tor-nodes/main/latest.all.csv)
+  * [Guard nodes](https://raw.githubusercontent.com/alireza-rezaee/tor-nodes/main/latest.guards.csv)
+  * [Exit nodes](https://raw.githubusercontent.com/alireza-rezaee/tor-nodes/main/latest.exits.csv)
