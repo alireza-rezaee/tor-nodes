@@ -30,16 +30,21 @@ jobs:
         run: dotnet run --project src/TorNodesParser
       - name: Push data
         run: |
-          find src/TorNodesParser -name '*-nodes.csv' -exec mv -t . {} +
-          if [ ! -f latest-tor-nodes.csv ] || [ "$(diff latest-tor-nodes.csv tor-nodes.csv)" != "" ]
+          find src/TorNodesParser -name '*.csv' -exec mv -t . {} +
+          if [ ! -f latest.all.csv ] || [ "$(diff latest.all all.csv)" != "" ]
           then
-            mv tor-nodes.csv latest-tor-nodes.csv
-            git add latest-tor-nodes.csv
+            mv all.csv latest.all.csv
+            git add latest.all.csv
           fi
-          if [ ! -f latest-tor-exit-nodes.csv ] || [ "$(diff latest-tor-exit-nodes.csv tor-exit-nodes.csv)" != "" ]
+          if [ ! -f latest.guards.csv ] || [ "$(diff latest.guards.csv guards.csv)" != "" ]
           then
-            mv tor-exit-nodes.csv latest-tor-exit-nodes.csv
-            git add latest-tor-exit-nodes.csv
+            mv guards.csv latest.guards.csv
+            git add latest.guards.csv
+          fi
+          if [ ! -f latest.exits.csv ] || [ "$(diff latest.exits.csv exits.csv)" != "" ]
+          then
+            mv exits.csv latest.exits.csv
+            git add latest.exits.csv
           fi
           if [[ `git diff --cached` ]]
           then

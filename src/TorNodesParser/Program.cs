@@ -4,23 +4,35 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-string allNodesCsvFilename = string.Empty;
-string existNodesCsvFilename = string.Empty;
+const string AllNodesCsvFilename = "all.csv";
+const string GuardNodesCsvFilename = "guards.csv";
+const string ExistNodesCsvFilename = "exits.csv";
+
+string allNodesCsvTempFilename = string.Empty;
+string guardNodesCsvTempFilename = string.Empty;
+string existNodesCsvTempFilename = string.Empty;
 try
 {
     using HttpClient client = new();
     const string URL = "https://onionoo.torproject.org/details?search=type:relay%20running:true";
     using Stream responseStream = await client.GetStreamAsync(URL);
 
-    allNodesCsvFilename = Path.GetTempFileName();
-    using FileStream allNodesFS = File.OpenWrite(allNodesCsvFilename);
-    using StreamWriter allNodesSW = new(allNodesFS);
-    allNodesSW.WriteLine("fingerprint, ipaddr, port");
+    const string CsvHeader = "fingerprint, ipaddr, port";
 
-    existNodesCsvFilename = Path.GetTempFileName();
-    using FileStream exitNodesFS = File.OpenWrite(existNodesCsvFilename);
+    allNodesCsvTempFilename = Path.GetTempFileName();
+    using FileStream allNodesFS = File.OpenWrite(allNodesCsvTempFilename);
+    using StreamWriter allNodesSW = new(allNodesFS);
+    allNodesSW.WriteLine(CsvHeader);
+
+    guardNodesCsvTempFilename = Path.GetTempFileName();
+    using FileStream guardNodesFS = File.OpenWrite(guardNodesCsvTempFilename);
+    using StreamWriter guardNodesSW = new(guardNodesFS);
+    guardNodesSW.WriteLine(CsvHeader);
+
+    existNodesCsvTempFilename = Path.GetTempFileName();
+    using FileStream exitNodesFS = File.OpenWrite(existNodesCsvTempFilename);
     using StreamWriter exitNodesSW = new(exitNodesFS);
-    exitNodesSW.WriteLine("fingerprint, ipaddr, port");
+    exitNodesSW.WriteLine(CsvHeader);
 
     using StreamReader streamReader = new(responseStream);
     for (string? line = null; (line = await streamReader.ReadLineAsync()) != null;)
@@ -36,21 +48,27 @@ try
             continue;
 
         await allNodesSW.WriteLineAsync(node.ToCSV());
+        if (node.Flags.Select(i => i.ToLower()).Contains("guard"))
+            await guardNodesSW.WriteLineAsync(node.ToCSV());
         if (node.Flags.Select(i => i.ToLower()).Contains("exit"))
             await exitNodesSW.WriteLineAsync(node.ToCSV());
     }
 
     string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
-    File.Move(allNodesCsvFilename, Path.Combine(currentDirectory, "tor-nodes.csv"), true);
-    File.Move(existNodesCsvFilename, Path.Combine(currentDirectory, "tor-exit-nodes.csv"), true);
+    File.Move(allNodesCsvTempFilename, Path.Combine(currentDirectory, AllNodesCsvFilename), true);
+    File.Move(guardNodesCsvTempFilename, Path.Combine(currentDirectory, GuardNodesCsvFilename), true);
+    File.Move(existNodesCsvTempFilename, Path.Combine(currentDirectory, ExistNodesCsvFilename), true);
 }
 catch
 {
-    if (File.Exists(allNodesCsvFilename))
-        File.Delete(allNodesCsvFilename);
+    if (File.Exists(allNodesCsvTempFilename))
+        File.Delete(allNodesCsvTempFilename);
 
-    if (File.Exists(existNodesCsvFilename))
-        File.Delete(existNodesCsvFilename);
+    if (File.Exists(guardNodesCsvTempFilename))
+        File.Delete(guardNodesCsvTempFilename);
+
+    if (File.Exists(existNodesCsvTempFilename))
+        File.Delete(existNodesCsvTempFilename);
 }
 
 
