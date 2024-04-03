@@ -31,7 +31,7 @@ jobs:
       - name: Push data
         run: |
           find src/TorNodesParser -name '*.csv' -exec mv -t . {} +
-          if [ ! -f latest.all.csv ] || [ "$(diff latest.all all.csv)" != "" ]
+          if [ ! -f latest.all.csv ] || [ "$(diff latest.all.csv all.csv)" != "" ]
           then
             mv all.csv latest.all.csv
             git add latest.all.csv
