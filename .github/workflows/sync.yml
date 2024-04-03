@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   sync:
-    name: update data
+    name: sync
     runs-on: ubuntu-latest
     env:
         DOTNET_NOLOGO: true
@@ -44,6 +44,6 @@ jobs:
           then
             git config user.name github-actions
             git config user.email github-actions@github.com
-            git commit -m "update data"
+            git commit -m "chore: auto sync" -m "[skip ci]"
             git push
           fi
